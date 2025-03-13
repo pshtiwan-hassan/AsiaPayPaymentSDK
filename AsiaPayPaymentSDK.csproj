@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<!-- Target only .NET 8 and .NET 9 -->
 		<TargetFrameworks>net8.0</TargetFrameworks>
-		<OutputType>Exe</OutputType>
+		<OutputType>Library</OutputType>
 		<!-- NuGet Package Metadata -->
 		<PackageId>AsiaPayPaymentSDK</PackageId>
 		<Version>1.0.0</Version>
