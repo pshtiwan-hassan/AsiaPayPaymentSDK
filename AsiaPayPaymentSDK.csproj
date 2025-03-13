@@ -20,7 +20,7 @@
 		<Nullable>enable</Nullable>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>logo.png</PackageIcon>
-		<ApplicationIcon>logo.png</ApplicationIcon>
+		
 	</PropertyGroup>
 
 	<ItemGroup>
