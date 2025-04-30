@@ -46,7 +46,8 @@ using AsiaPayPaymentSDK.AsiaPay;
 var httpClient = new HttpClient();
 var paymentService = new AsiaPayService(
     httpClient, 
-    PaymentConstants.ServerUrl, 
+    PaymentConstants.ServerUrl,
+    PaymentConstants.AppSecret,
     PaymentConstants.XAppKey, 
     PaymentConstants.AppId, 
     PaymentConstants.MerchCode, 
