@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -20,6 +20,7 @@ namespace AsiaPayPaymentSDK.AsiaPay
     public class AsiaPayService(
         HttpClient httpClient,
         string baseUrl,
+        string appSecret,
         string appKey,
         string appId,
         string? merchCode,
@@ -36,7 +37,7 @@ namespace AsiaPayPaymentSDK.AsiaPay
             var url = $"{baseUrl}/payment/gateway/payment/v1/token";
             var request = new HttpRequestMessage(HttpMethod.Post, url)
             {
-                Content = new StringContent(JsonSerializer.Serialize(new { appSecret = PaymentConstants.AppSecret }), Encoding.UTF8, "application/json")
+                Content = new StringContent(JsonSerializer.Serialize(new { appSecret = appSecret }), Encoding.UTF8, "application/json")
             };
 
             request.Headers.Add("X-APP-Key", appKey);
