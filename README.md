@@ -47,6 +47,7 @@ var httpClient = new HttpClient();
 var paymentService = new AsiaPayService(
     httpClient, 
     PaymentConstants.ServerUrl,
+    PaymentConstants.CheckH5MidPageUrl, 
     PaymentConstants.AppSecret,
     PaymentConstants.XAppKey, 
     PaymentConstants.AppId, 
