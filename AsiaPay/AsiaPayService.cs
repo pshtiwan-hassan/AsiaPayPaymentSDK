@@ -49,7 +49,7 @@ namespace AsiaPayPaymentSDK.AsiaPay
             if (tokenResponse?.Token != null)
             {
                 _cachedToken = tokenResponse.Token;
-                _tokenExpiration = DateTime.ParseExact(tokenResponse.ExpirationDate, "yyyyMMddHHmmss", null);
+                _tokenExpiration = DateTime.ParseExact(tokenResponse.ExpirationDate!, "yyyyMMddHHmmss", null);
             }
 
             return tokenResponse;
