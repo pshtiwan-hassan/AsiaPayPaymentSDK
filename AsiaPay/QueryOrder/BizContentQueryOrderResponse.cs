@@ -20,7 +20,7 @@ public class BizContentQueryOrderResponse
     public string? TransCurrency { get; set; }
 
     [JsonPropertyName("total_amount")]
-    public decimal? TotalAmount { get; set; }
+    public string? TotalAmount { get; set; }
 
     [JsonPropertyName("trans_id")]
     public string? TransId { get; set; }
