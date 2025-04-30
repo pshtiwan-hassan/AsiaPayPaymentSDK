@@ -20,6 +20,7 @@ namespace AsiaPayPaymentSDK.AsiaPay
     public class AsiaPayService(
         HttpClient httpClient,
         string baseUrl,
+        string CheckH5MidPageUrl,
         string appSecret,
         string appKey,
         string appId,
@@ -335,14 +336,14 @@ namespace AsiaPayPaymentSDK.AsiaPay
                 type = "PhoneH5",
                 schemaAndroid = "asiapay://h5checkout",
                 //schemaIOS = "asiapay://h5checkout",
-                middlePageUrl = $"{PaymentConstants.CheckH5MidPageUrl}",
+                middlePageUrl = $"{CheckH5MidPageUrl}",
                 checkOutStr = $"tradeType=Cross-App&rawRequest={encodeRowRequest}"
             };
 
             string appCheckOutString = JsonSerializer.Serialize(appCheckOutData);
             string appCheckOutStringBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(appCheckOutString));
 
-            string h5Url = $"{PaymentConstants.CheckH5MidPageUrl}&params={appCheckOutStringBase64}";
+            string h5Url = $"{CheckH5MidPageUrl}&params={appCheckOutStringBase64}";
             return h5Url;
         }
 
