@@ -1,33 +1,34 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<!-- Target only .NET 8 and .NET 9 -->
-		<TargetFrameworks>net8.0</TargetFrameworks>
-		<OutputType>Library</OutputType>
-		<!-- NuGet Package Metadata -->
-		<PackageId>AsiaPayPaymentSDK</PackageId>
-		<Version>1.0.0</Version>
-		<Authors>Pshtiwan Hassan</Authors>
-		<Company></Company>
-		<Description>AsiaPayPaymentSDK supporting .NET 8</Description>
-		<PackageTags>asiapay, payment, sdk, .net9, .net8</PackageTags>
-		<RepositoryUrl>https://github.com/pshtiwan-hassan</RepositoryUrl>
-		<PackageProjectUrl>https://github.com/pshtiwan-hassan/AsiaPayPaymentSDK</PackageProjectUrl>
-		<RepositoryType>git</RepositoryType>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<IncludeSymbols>true</IncludeSymbols>
-		<IncludeSource>true</IncludeSource>
-		<Nullable>enable</Nullable>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageIcon>logo.png</PackageIcon> 
-		
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <OutputType>Library</OutputType>
 
-	<ItemGroup>
-	  <Content Include="logo.png" />
-	</ItemGroup>
+    <!-- NuGet Package Metadata -->
+    <PackageId>AsiaPayPaymentSDK</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Pshtiwan Hassan</Authors>
+    <Description>AsiaPayPaymentSDK supporting .NET 8</Description>
+    <PackageTags>asiapay, payment, sdk, .net8</PackageTags>
+    <RepositoryUrl>https://github.com/pshtiwan-hassan</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/pshtiwan-hassan/AsiaPayPaymentSDK</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <IncludeSymbols>true</IncludeSymbols>
+    <IncludeSource>true</IncludeSource>
+    <Nullable>enable</Nullable>
 
-  <ItemGroup> 
+    <!-- Include Readme and Icon -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>logo.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="logo.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="QRCoder" Version="1.6.0" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.1" />
   </ItemGroup>
