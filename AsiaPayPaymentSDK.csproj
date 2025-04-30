@@ -6,7 +6,7 @@
 
     <!-- NuGet Package Metadata -->
     <PackageId>AsiaPayPaymentSDK</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Pshtiwan Hassan</Authors>
     <Description>AsiaPayPaymentSDK supporting .NET 8</Description>
     <PackageTags>asiapay, payment, sdk, .net8</PackageTags>
