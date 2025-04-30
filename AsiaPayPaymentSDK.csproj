@@ -19,7 +19,7 @@
 		<IncludeSource>true</IncludeSource>
 		<Nullable>enable</Nullable>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageIcon>logo.png</PackageIcon>
+		<PackageIcon>logo.png</PackageIcon> 
 		
 	</PropertyGroup>
 
