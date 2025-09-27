@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -32,7 +33,8 @@ namespace AsiaPayPaymentSDK.AsiaPay
 
         public async Task<AsiaPayAuthorizationResponse?> GetAccessTokenAsync()
         {
-            if (!string.IsNullOrEmpty(_cachedToken) && DateTime.Now < _tokenExpiration.AddHours(11))
+            // Use UTC to avoid timezone issues and a small skew for safety
+            if (!string.IsNullOrEmpty(_cachedToken) && DateTime.UtcNow < _tokenExpiration.AddMinutes(-5))
                 return new AsiaPayAuthorizationResponse { Token = _cachedToken.Replace("Bearer ", "") };
 
             var url = $"{baseUrl}/payment/gateway/payment/v1/token";
@@ -48,10 +50,10 @@ namespace AsiaPayPaymentSDK.AsiaPay
             var responseBody = await response.Content.ReadAsStringAsync();
             var tokenResponse = JsonSerializer.Deserialize<AsiaPayAuthorizationResponse>(responseBody);
 
-            if (tokenResponse?.Token != null)
+            if (tokenResponse?.Token != null && !string.IsNullOrWhiteSpace(tokenResponse.ExpirationDate))
             {
                 _cachedToken = tokenResponse.Token;
-                _tokenExpiration = DateTime.ParseExact(tokenResponse.ExpirationDate!, "yyyyMMddHHmmss", null);
+                _tokenExpiration = DateTime.ParseExact(tokenResponse.ExpirationDate!, "yyyyMMddHHmmss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
             }
 
             return tokenResponse;
@@ -350,8 +352,12 @@ namespace AsiaPayPaymentSDK.AsiaPay
 
         private static string PrepareSign(Dictionary<string, string?> parameters)
         {
-            //parameters.Add("method", method);
-            return string.Join("&", parameters.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+            // Sort keys and exclude null/empty values for deterministic signatures
+            var filtered = parameters
+                .Where(p => !string.IsNullOrEmpty(p.Value))
+                .OrderBy(p => p.Key, StringComparer.Ordinal)
+                .Select(kvp => $"{kvp.Key}={kvp.Value}");
+            return string.Join("&", filtered);
         }
 
 
@@ -372,7 +378,8 @@ namespace AsiaPayPaymentSDK.AsiaPay
             using var rsa = RSA.Create();
             rsa.ImportPkcs8PrivateKey(keyBytes, out _);
 
-            byte[] signedData = rsa.SignData(dataBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+            // AsiaPay expects SHA256WithRSA (PKCS#1 v1.5), not PSS
+            byte[] signedData = rsa.SignData(dataBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
             // Return the signature as a Base64-encoded string
             return Convert.ToBase64String(signedData);
         }
