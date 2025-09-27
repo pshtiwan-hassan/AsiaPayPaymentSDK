@@ -32,7 +32,7 @@ namespace AsiaPayPaymentSDK.AsiaPay
 
         public async Task<AsiaPayAuthorizationResponse?> GetAccessTokenAsync()
         {
-            if (!string.IsNullOrEmpty(_cachedToken) && DateTime.Now < _tokenExpiration.AddHours(11))
+            if (!string.IsNullOrEmpty(_cachedToken) && DateTime.UtcNow < _tokenExpiration.AddHours(11))
                 return new AsiaPayAuthorizationResponse { Token = _cachedToken.Replace("Bearer ", "") };
 
             var url = $"{baseUrl}/payment/gateway/payment/v1/token";
@@ -51,7 +51,10 @@ namespace AsiaPayPaymentSDK.AsiaPay
             if (tokenResponse?.Token != null)
             {
                 _cachedToken = tokenResponse.Token;
-                _tokenExpiration = DateTime.ParseExact(tokenResponse.ExpirationDate!, "yyyyMMddHHmmss", null);
+                // Parse as UTC to ensure consistent timezone handling
+                _tokenExpiration = DateTime.SpecifyKind(
+                    DateTime.ParseExact(tokenResponse.ExpirationDate!, "yyyyMMddHHmmss", null), 
+                    DateTimeKind.Utc);
             }
 
             return tokenResponse;
@@ -112,16 +115,29 @@ namespace AsiaPayPaymentSDK.AsiaPay
 
 
 
-        // Helper Method for Logging the Request
+        // Helper Method for Logging the Request (Security-aware)
         private static void LogRequest(HttpRequestMessage request, object? data)
         {
             Console.WriteLine($"------ HTTP Request ({request.Method}) ------");
             Console.WriteLine($"URL: {request.RequestUri}");
+            
+            // Log headers but exclude sensitive ones
+            var sensitiveHeaders = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
+            { 
+                "Authorization", "X-APP-Key", "X-API-Key", "Cookie" 
+            };
+            
             foreach (var header in request.Headers)
-                Console.WriteLine($"  {header.Key}: {string.Join(", ", header.Value)}");
+            {
+                if (sensitiveHeaders.Contains(header.Key))
+                    Console.WriteLine($"  {header.Key}: [REDACTED]");
+                else
+                    Console.WriteLine($"  {header.Key}: {string.Join(", ", header.Value)}");
+            }
 
+            // Don't log request content as it may contain sensitive payment information
             if (data != null)
-                Console.WriteLine("Content: " + JsonSerializer.Serialize(data ));
+                Console.WriteLine("Content: [REDACTED - Contains sensitive payment data]");
 
             Console.WriteLine("--------------------------------------------");
         }
@@ -148,7 +164,8 @@ namespace AsiaPayPaymentSDK.AsiaPay
                 { "version", request.Version }
             };
             string signSourceString = PrepareSign(parameters);
-            Console.WriteLine("Sign Source String: " + signSourceString);
+            // Don't log signature source string as it contains sensitive payment parameters
+            Console.WriteLine("Sign Source String: [REDACTED - Contains sensitive signature parameters]");
 
             request.Sign = GenerateSignature(signSourceString, privateKey);
 
@@ -202,8 +219,8 @@ namespace AsiaPayPaymentSDK.AsiaPay
             if (response?.BizContent?.PayToken == null)
                 throw new Exception("Failed to retrieve pay token from response");
 
-
-            Console.WriteLine("Apply Pay Token Response: " + responseJson);
+            // Don't log response as it contains sensitive payment token data
+            Console.WriteLine("Apply Pay Token Response: [SUCCESS - Token retrieved]");
 
             return response;
         }
@@ -284,7 +301,7 @@ namespace AsiaPayPaymentSDK.AsiaPay
 
         public async Task<AsiaPayQueryOrderResponse?> QueryOrderAsync(string? merchOrderId)
         {
-            var timestamp = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
             var nonceStr = Guid.NewGuid().ToString("N").ToLower();
 
 
