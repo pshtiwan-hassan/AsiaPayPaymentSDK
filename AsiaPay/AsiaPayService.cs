@@ -32,7 +32,7 @@ namespace AsiaPayPaymentSDK.AsiaPay
 
         public async Task<AsiaPayAuthorizationResponse?> GetAccessTokenAsync()
         {
-            if (!string.IsNullOrEmpty(_cachedToken) && DateTime.Now < _tokenExpiration.AddHours(11))
+            if (!string.IsNullOrEmpty(_cachedToken) && DateTime.UtcNow < _tokenExpiration)
                 return new AsiaPayAuthorizationResponse { Token = _cachedToken.Replace("Bearer ", "") };
 
             var url = $"{baseUrl}/payment/gateway/payment/v1/token";
@@ -284,7 +284,7 @@ namespace AsiaPayPaymentSDK.AsiaPay
 
         public async Task<AsiaPayQueryOrderResponse?> QueryOrderAsync(string? merchOrderId)
         {
-            var timestamp = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
             var nonceStr = Guid.NewGuid().ToString("N").ToLower();
 
 
