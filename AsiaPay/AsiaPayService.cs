@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Globalization;
 using System.Web;
 using AsiaPayPaymentSDK.AsiaPay.Auth;
 using AsiaPayPaymentSDK.AsiaPay.PayToken;
@@ -32,7 +33,7 @@ namespace AsiaPayPaymentSDK.AsiaPay
 
         public async Task<AsiaPayAuthorizationResponse?> GetAccessTokenAsync()
         {
-            if (!string.IsNullOrEmpty(_cachedToken) && DateTime.Now < _tokenExpiration.AddHours(11))
+            if (!string.IsNullOrEmpty(_cachedToken) && DateTime.UtcNow < _tokenExpiration.AddMinutes(-5))
                 return new AsiaPayAuthorizationResponse { Token = _cachedToken.Replace("Bearer ", "") };
 
             var url = $"{baseUrl}/payment/gateway/payment/v1/token";
@@ -51,7 +52,7 @@ namespace AsiaPayPaymentSDK.AsiaPay
             if (tokenResponse?.Token != null)
             {
                 _cachedToken = tokenResponse.Token;
-                _tokenExpiration = DateTime.ParseExact(tokenResponse.ExpirationDate!, "yyyyMMddHHmmss", null);
+                _tokenExpiration = DateTime.ParseExact(tokenResponse.ExpirationDate!, "yyyyMMddHHmmss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
             }
 
             return tokenResponse;
@@ -118,10 +119,15 @@ namespace AsiaPayPaymentSDK.AsiaPay
             Console.WriteLine($"------ HTTP Request ({request.Method}) ------");
             Console.WriteLine($"URL: {request.RequestUri}");
             foreach (var header in request.Headers)
-                Console.WriteLine($"  {header.Key}: {string.Join(", ", header.Value)}");
+            {
+                if (string.Equals(header.Key, "Authorization", StringComparison.OrdinalIgnoreCase))
+                    Console.WriteLine($"  {header.Key}: Bearer ***REDACTED***");
+                else
+                    Console.WriteLine($"  {header.Key}: {string.Join(", ", header.Value)}");
+            }
 
             if (data != null)
-                Console.WriteLine("Content: " + JsonSerializer.Serialize(data ));
+                Console.WriteLine("Content: [redacted]");
 
             Console.WriteLine("--------------------------------------------");
         }
@@ -372,7 +378,7 @@ namespace AsiaPayPaymentSDK.AsiaPay
             using var rsa = RSA.Create();
             rsa.ImportPkcs8PrivateKey(keyBytes, out _);
 
-            byte[] signedData = rsa.SignData(dataBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pss);
+            byte[] signedData = rsa.SignData(dataBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
             // Return the signature as a Base64-encoded string
             return Convert.ToBase64String(signedData);
         }
