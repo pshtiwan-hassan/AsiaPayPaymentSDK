@@ -51,7 +51,15 @@ namespace AsiaPayPaymentSDK.AsiaPay
             if (tokenResponse?.Token != null)
             {
                 _cachedToken = tokenResponse.Token;
-                _tokenExpiration = DateTime.ParseExact(tokenResponse.ExpirationDate!, "yyyyMMddHHmmss", null);
+                if (!string.IsNullOrEmpty(tokenResponse.ExpirationDate))
+                {
+                    _tokenExpiration = DateTime.ParseExact(tokenResponse.ExpirationDate, "yyyyMMddHHmmss", null);
+                }
+                else
+                {
+                    // Set a default expiration time if not provided (e.g., 1 hour from now)
+                    _tokenExpiration = DateTime.UtcNow.AddHours(1);
+                }
             }
 
             return tokenResponse;
@@ -284,7 +292,7 @@ namespace AsiaPayPaymentSDK.AsiaPay
 
         public async Task<AsiaPayQueryOrderResponse?> QueryOrderAsync(string? merchOrderId)
         {
-            var timestamp = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
             var nonceStr = Guid.NewGuid().ToString("N").ToLower();
 
 
